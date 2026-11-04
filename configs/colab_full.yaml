@@ -1,0 +1,23 @@
+# Full-scale GPU run of the synthetic-proxy pipeline (see notebooks/colab_full_training.ipynb).
+# NOT YET RUN: the CPU-scale results in docs/ come from configs/fused_speaker.yaml.
+base: base.yaml
+name: colab_full
+output_dir: runs
+data:
+  n_train: 60000
+  n_val: 5000
+  n_test: 10000
+  num_workers: 2
+model:
+  modalities: [audio, text, speaker]
+  d_model: 192
+  n_heads: 6
+  audio_layers: 6
+  text_layers: 4
+  modality_dropout: 0.1
+train:
+  epochs: 30
+  batch_size: 128
+  lr: 0.001
+  patience: 8
+  device: auto

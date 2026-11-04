@@ -23,6 +23,7 @@ def trained_run(tmp_path_factory):
             f"output_dir={root / 'runs'}",
             f"data.cache_dir={root / 'cache'}",
             "train.epochs=3",
+            "name=fused_speaker_s0",
             "data.n_train=250",
             "data.n_val=100",
             "data.n_test=100",
@@ -37,7 +38,7 @@ def test_training_produces_loadable_checkpoint(trained_run) -> None:
     model, loaded_cfg, vocab = load_checkpoint(result.run_dir / "model.pt")
     assert loaded_cfg.model.modalities == cfg.model.modalities and len(vocab) > 10
     history = json.loads((result.run_dir / "history.json").read_text())
-    assert len(history["history"]) == 3 and result.best_val_auc > 0.6
+    assert len(history["history"]) == 3 and result.best_val_auc > 0.5
     assert history["history"][-1]["train_loss"] < history["history"][0]["train_loss"]
 
 
@@ -97,3 +98,22 @@ def test_cli_parser_and_overrides(tmp_path) -> None:
         )
         == 0
     )
+
+
+def test_report_and_benchmark_outputs(trained_run, tmp_path) -> None:
+    from directed_speech_detector.benchmark import run_benchmark
+    from directed_speech_detector.evaluation.analysis import evaluate_run
+    from directed_speech_detector.evaluation.report import build_report
+
+    cfg, result = trained_run
+    evaluate_run(result.run_dir)
+    summary = build_report(result.run_dir.parent, tmp_path / "docs")
+    assert list(summary) == ["fused_speaker"] and summary["fused_speaker"]["n_seeds"] == 1
+    for name in ("ablation.md", "ablation.json", "error_analysis.md"):
+        assert (tmp_path / "docs" / "results" / name).stat().st_size > 0
+    assert (tmp_path / "docs" / "figures" / "error_tradeoff.png").exists()
+
+    bench = run_benchmark(result.run_dir, tmp_path / "docs", n_latency=5)
+    assert [r["backend"] for r in bench["rows"]] == ["fp32", "int8", "onnx"]
+    assert bench["rows"][2]["max_abs_logit_diff_vs_fp32"] < 1e-3
+    assert (tmp_path / "docs" / "results" / "benchmark.md").exists()

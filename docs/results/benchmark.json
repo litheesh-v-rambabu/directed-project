@@ -1,0 +1,62 @@
+{
+  "run": "fused_speaker_s0",
+  "modalities": [
+    "audio",
+    "text",
+    "speaker"
+  ],
+  "n_parameters": 552771,
+  "threads": 1,
+  "latency_iterations": 300,
+  "n_test": 2000,
+  "feature_extraction_p50_ms_2.5s_audio": 0.5679294999936246,
+  "hardware": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "logical_cores": 4,
+    "platform": "Linux-6.18.44-fc-v233-x86_64-with-glibc2.39",
+    "python": "3.13.18",
+    "torch": "2.15.0+cu132",
+    "cuda": false
+  },
+  "rows": [
+    {
+      "backend": "fp32",
+      "size_mb": 2.242834,
+      "latency_p50_ms": 2.5681289998829016,
+      "latency_p95_ms": 4.133511850204741,
+      "throughput_utt_per_s_batch32": 741.5398529255334,
+      "accuracy_at_fp32_threshold": 0.918,
+      "frr_at_fp32_threshold": 0.10592808551992225,
+      "far_at_fp32_threshold": 0.05664263645726056,
+      "auc": 0.9783908266852422,
+      "eer": 0.07312049433573635,
+      "max_abs_logit_diff_vs_fp32": 0.0
+    },
+    {
+      "backend": "int8",
+      "size_mb": 0.883357,
+      "latency_p50_ms": 2.921395999692322,
+      "latency_p95_ms": 4.457087400487581,
+      "throughput_utt_per_s_batch32": 867.7535460617103,
+      "accuracy_at_fp32_threshold": 0.918,
+      "frr_at_fp32_threshold": 0.10495626822157435,
+      "far_at_fp32_threshold": 0.057672502574665295,
+      "auc": 0.978368808167669,
+      "eer": 0.07312049433573635,
+      "max_abs_logit_diff_vs_fp32": 0.2995157241821289
+    },
+    {
+      "backend": "onnx",
+      "size_mb": 2.332058,
+      "latency_p50_ms": 1.7375359998368367,
+      "latency_p95_ms": 2.8346773004614083,
+      "throughput_utt_per_s_batch32": 472.6489290186169,
+      "accuracy_at_fp32_threshold": 0.918,
+      "frr_at_fp32_threshold": 0.10592808551992225,
+      "far_at_fp32_threshold": 0.05664263645726056,
+      "auc": 0.9783908266852422,
+      "eer": 0.07312049433573635,
+      "max_abs_logit_diff_vs_fp32": 1.049041748046875e-05
+    }
+  ]
+}

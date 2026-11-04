@@ -41,15 +41,24 @@ class SplitArrays:
     def subset(self, n: int) -> SplitArrays:
         end = int(self.offsets[n])
         return SplitArrays(
-            self.feats[:end], self.offsets[: n + 1], self.texts[:n], self.labels[:n],
-            self.enroll_profile[:n], {k: v[:n] for k, v in self.meta.items()},
+            self.feats[:end],
+            self.offsets[: n + 1],
+            self.texts[:n],
+            self.labels[:n],
+            self.enroll_profile[:n],
+            {k: v[:n] for k, v in self.meta.items()},
         )
 
 
 def _cache_key(data: DataConfig, feats: FeatureConfig, split: str, n: int) -> str:
     blob = json.dumps(
-        {"data": {**data.__dict__, "num_workers": 0, "cache_dir": ""}, "feats": feats.__dict__,
-         "split": split, "n": n, "v": 3},
+        {
+            "data": {**data.__dict__, "num_workers": 0, "cache_dir": "", "manifest_dir": None},
+            "feats": feats.__dict__,
+            "split": split,
+            "n": n,
+            "v": 3,
+        },
         sort_keys=True,
     )
     return hashlib.sha1(blob.encode()).hexdigest()[:12]
@@ -59,8 +68,11 @@ def build_split(data: DataConfig, feats_cfg: FeatureConfig, split: str, n: int) 
     """Generate ``n`` synthetic utterances for ``split`` and compute log-mel features."""
     extractor = LogMelExtractor(feats_cfg, data.sample_rate)
     households = generate_households(
-        data.seed + SPLIT_SEED_OFFSET[split], n, data.utterances_per_household,
-        data.max_seconds, data.num_workers,
+        data.seed + SPLIT_SEED_OFFSET[split],
+        n,
+        data.utterances_per_household,
+        data.max_seconds,
+        data.num_workers,
     )
     chunks: list[np.ndarray] = []
     texts: list[str] = []
@@ -96,8 +108,11 @@ def save_split(path: Path, split: SplitArrays) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     arrays: dict[str, Any] = {f"meta_{k}": v for k, v in split.meta.items()}
     arrays.update(
-        feats=split.feats, offsets=split.offsets, texts=np.array(split.texts, dtype=str),
-        labels=split.labels, enroll_profile=split.enroll_profile,
+        feats=split.feats,
+        offsets=split.offsets,
+        texts=np.array(split.texts, dtype=str),
+        labels=split.labels,
+        enroll_profile=split.enroll_profile,
     )
     np.savez_compressed(path, **arrays)
 
@@ -105,14 +120,26 @@ def save_split(path: Path, split: SplitArrays) -> None:
 def load_split(path: Path) -> SplitArrays:
     with np.load(path, allow_pickle=False) as z:
         return SplitArrays(
-            feats=z["feats"], offsets=z["offsets"], texts=[str(t) for t in z["texts"]],
-            labels=z["labels"], enroll_profile=z["enroll_profile"],
+            feats=z["feats"],
+            offsets=z["offsets"],
+            texts=[str(t) for t in z["texts"]],
+            labels=z["labels"],
+            enroll_profile=z["enroll_profile"],
             meta={k[5:]: z[k] for k in z.files if k.startswith("meta_")},
         )
 
 
 def get_split(cfg: ExperimentConfig, split: str) -> SplitArrays:
     """Load a split from the on-disk cache, generating it first if necessary."""
+    if cfg.data.manifest_dir:
+        from directed_speech_detector.data.manifest import split_from_manifest
+
+        return split_from_manifest(
+            Path(cfg.data.manifest_dir) / f"{split}.csv",
+            cfg.features,
+            cfg.data.max_seconds,
+            cfg.data.sample_rate,
+        )
     n = {"train": cfg.data.n_train, "val": cfg.data.n_val, "test": cfg.data.n_test}[split]
     path = Path(cfg.data.cache_dir) / f"{split}_{_cache_key(cfg.data, cfg.features, split, n)}.npz"
     if path.exists():
@@ -127,8 +154,13 @@ class DirectedSpeechDataset(Dataset[dict[str, Any]]):
     """Map-style dataset yielding one utterance's features, tokens and label."""
 
     def __init__(
-        self, split: SplitArrays, vocab: Vocabulary, max_text_len: int,
-        word_dropout: float = 0.0, enrollment_dropout: float = 0.0, seed: int = 0,
+        self,
+        split: SplitArrays,
+        vocab: Vocabulary,
+        max_text_len: int,
+        word_dropout: float = 0.0,
+        enrollment_dropout: float = 0.0,
+        seed: int = 0,
     ) -> None:
         self.split, self.vocab, self.max_text_len = split, vocab, max_text_len
         self.word_dropout, self.enrollment_dropout = word_dropout, enrollment_dropout
@@ -178,9 +210,13 @@ def collate_batch(items: Sequence[dict[str, Any]]) -> dict[str, torch.Tensor]:
     }
 
 
-def make_loader(dataset: Dataset[dict[str, Any]], batch_size: int, shuffle: bool, seed: int = 0) -> DataLoader[dict[str, Any]]:
+def make_loader(
+    dataset: Dataset[dict[str, Any]], batch_size: int, shuffle: bool, seed: int = 0
+) -> DataLoader[dict[str, Any]]:
     generator = torch.Generator().manual_seed(seed)
-    return DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, collate_fn=collate_batch, generator=generator)
+    return DataLoader(
+        dataset, batch_size=batch_size, shuffle=shuffle, collate_fn=collate_batch, generator=generator
+    )
 
 
 def fit_feature_stats(split: SplitArrays) -> dict[str, torch.Tensor]:

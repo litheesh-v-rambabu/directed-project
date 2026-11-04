@@ -341,10 +341,14 @@ def render_utterance(
 
 def sample_style(directed: bool, rng: np.random.Generator) -> Style:
     if directed:
-        return Style(rate=float(np.clip(rng.normal(0.95, 0.12), 0.7, 1.3)),
-                     pitch_depth=float(np.clip(rng.normal(0.18, 0.06), 0.05, 0.4)))
-    return Style(rate=float(np.clip(rng.normal(1.1, 0.15), 0.7, 1.5)),
-                 pitch_depth=float(np.clip(rng.normal(0.10, 0.05), 0.02, 0.3)))
+        return Style(
+            rate=float(np.clip(rng.normal(0.95, 0.12), 0.7, 1.3)),
+            pitch_depth=float(np.clip(rng.normal(0.18, 0.06), 0.05, 0.4)),
+        )
+    return Style(
+        rate=float(np.clip(rng.normal(1.1, 0.15), 0.7, 1.5)),
+        pitch_depth=float(np.clip(rng.normal(0.10, 0.05), 0.02, 0.3)),
+    )
 
 
 def generate_household(task: tuple[int, int, int, float, int]) -> dict[str, Any]:
@@ -406,5 +410,7 @@ def generate_households(
         household += 1
     if num_workers <= 1 or len(tasks) < 4:
         return [generate_household(t) for t in tasks]
-    with mp.get_context("fork" if "fork" in mp.get_all_start_methods() else "spawn").Pool(num_workers) as pool:
+    with mp.get_context("fork" if "fork" in mp.get_all_start_methods() else "spawn").Pool(
+        num_workers
+    ) as pool:
         return pool.map(generate_household, tasks, chunksize=2)

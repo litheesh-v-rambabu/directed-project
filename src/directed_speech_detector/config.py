@@ -28,6 +28,7 @@ class DataConfig:
     seed: int = 1234
     cache_dir: str = "data/cache"
     num_workers: int = 4
+    manifest_dir: str | None = None  # directory with train.csv / val.csv / test.csv of real audio
 
 
 @dataclass
@@ -90,6 +91,10 @@ class ExperimentConfig:
             raise ValueError(f"modalities must be a non-empty subset of {VALID_MODALITIES}: {bad}")
         if self.model.d_model % self.model.n_heads:
             raise ValueError("model.d_model must be divisible by model.n_heads")
+        if self.data.manifest_dir and "speaker" in self.model.modalities:
+            raise ValueError(
+                "Manifest (real-audio) data has no enrollment profiles; drop the 'speaker' modality"
+            )
         if not 0.0 < self.eval.target_far < 1.0:
             raise ValueError("eval.target_far must be in (0, 1)")
 
