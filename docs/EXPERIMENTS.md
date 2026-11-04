@@ -16,10 +16,10 @@ Each run was evaluated on the test split with the temperature and the 5%-FAR thr
 
 | Model | Seeds | Acc % @5% FAR (s0 / s1 / s2) | FRR % @5% FAR | Test FAR % @5% threshold | EER % | Train time s (seed 0, 1 thread, 3 jobs in parallel) | Best epoch (s0) |
 |---|---|---|---|---|---|---:|---:|
-| Audio only | 0,1,2 | 81.9 / 83.2 / 82.4 | 30.6 / 27.4 / 30.2 | 4.9 / 5.6 / 4.3 | see ablation.md | 466 | 7 |
-| Text only | 0,1,2 | 62.9 / 61.3 / 61.1 | 67.5 / 71.9 / 72.7 | 4.7 / 3.6 / 3.1 | see ablation.md | 33 | 8 |
-| Audio + text | 0,1,2 | 90.9 / 90.9 / 90.6 | 12.7 / 12.7 / 13.5 | 5.3 / 5.3 / 4.9 | see ablation.md | 540 | 8 |
-| Audio + text + speaker | 0,1,2 | 91.8 / 91.4 / 90.9 | 10.6 / 11.6 / 11.7 | 5.7 / 5.4 / 6.4 | see ablation.md | 566 | 8 |
+| Audio only | 0,1,2 | 81.9 / 83.2 / 82.4 | 30.6 / 27.4 / 30.2 | 4.9 / 5.6 / 4.3 | 13.6 ± 0.9 | 466 | 7 |
+| Text only | 0,1,2 | 62.9 / 61.3 / 61.1 | 67.5 / 71.9 / 72.7 | 4.7 / 3.6 / 3.1 | 17.3 ± 0.2 | 33 | 8 |
+| Audio + text | 0,1,2 | 90.9 / 90.9 / 90.6 | 12.7 / 12.7 / 13.5 | 5.3 / 5.3 / 4.9 | 7.5 ± 0.1 | 540 | 8 |
+| Audio + text + speaker | 0,1,2 | 91.8 / 91.4 / 90.9 | 10.6 / 11.6 / 11.7 | 5.7 / 5.4 / 6.4 | 7.8 ± 0.4 | 566 | 8 |
 
 Operating point at **1% FAR** (same thresholds procedure) is much harder at this data scale: Audio + text + speaker reaches 71.2 / 69.4 / 75.0 % accuracy with FRR 55.8 / 58.9 / 47.6 % (seeds 0/1/2, test FAR 0.3–0.9 %). With the default 0.5 threshold on uncalibrated probabilities, the same model scores 92.9 / 91.8 / 92.4 % accuracy. Per-run details are in each run's `metrics.json` (not committed); the aggregates are committed.
 
