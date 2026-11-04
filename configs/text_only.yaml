@@ -1,0 +1,5 @@
+base: base.yaml
+name: text_only
+model:
+  modalities: [text]
+  modality_dropout: 0.0

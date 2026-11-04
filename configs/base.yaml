@@ -1,0 +1,24 @@
+# Shared defaults for every experiment (synthetic proxy data, from-scratch encoders).
+name: base
+output_dir: runs
+data:
+  n_train: 6000
+  n_val: 1000
+  n_test: 2000
+  utterances_per_household: 25
+  seed: 1234
+  cache_dir: data/cache
+model:
+  d_model: 96
+  n_heads: 4
+  audio_layers: 3
+  text_layers: 2
+  dropout: 0.1
+train:
+  epochs: 12
+  batch_size: 64
+  lr: 0.002
+  seed: 0
+  patience: 4
+eval:
+  target_far: 0.05
