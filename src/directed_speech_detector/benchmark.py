@@ -73,7 +73,7 @@ def run_benchmark(run_dir: Path, docs_dir: Path, n_latency: int = 300, seed: int
     items = [ds[i] for i in range(len(ds))]
     labels = test.labels
     singles = [collate_batch([items[i]]) for i in np.random.default_rng(seed).permutation(len(items))[:100]]
-    bulk = [collate_batch(items[i : i + 32]) for i in range(0, 32 * 8, 32)]
+    bulk = [collate_batch([items[(i + j) % len(items)] for j in range(32)]) for i in range(0, 32 * 8, 32)]
     eval_batches = [collate_batch(items[i : i + 64]) for i in range(0, len(items), 64)]
 
     backends: dict[str, tuple[Backend, float]] = {
