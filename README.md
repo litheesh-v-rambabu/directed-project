@@ -44,7 +44,7 @@ pip install -e ".[all]"                              # package + serving, export
 dsd train --config configs/fused_speaker.yaml        # generates synthetic data, trains, evaluates -> runs/fused_speaker
 dsd serve --run-dir runs/fused_speaker --backend fp32 # API on http://127.0.0.1:8000 (docs at /docs)
 ```
-Then, from another shell, `curl localhost:8000/health`. Other commands: `make test lint typecheck`, `dsd ablate --seeds 0 1 2 && dsd report`, `dsd export --run-dir ...`, `dsd benchmark --run-dir ...`. A Docker image is defined (`Dockerfile`, `docker-compose.yml`) but **was not built here** (no Docker daemon in the sandbox).
+Then, from another shell, `curl localhost:8000/health`. Other commands: `make test lint typecheck`, `dsd ablate --seeds 0 1 2 && dsd report`, `dsd export --run-dir ...`, `dsd benchmark --run-dir ...`. The Docker image (`Dockerfile`, `docker-compose.yml`) was built and run on an Apple-silicon Mac with Docker Desktop (`RUN_DIR=./runs/fused_speaker docker compose up --build`; `/health` and `/predict` responded, see `docs/EXPERIMENTS.md` E7).
 
 Example request (`audio_base64` is little-endian 16 kHz mono PCM16; `serving/schemas.py::encode_audio` builds it):
 ```json
@@ -114,7 +114,7 @@ Config-driven (`configs/*.yaml`, `--set section.key=value` overrides), seeded ge
 - Models are tiny and trained from scratch; no pretrained speech/text encoders, no real ASR, no dialogue context, no multilingual support.
 - The speaker branch uses pooled log-mel statistics rather than a trained speaker embedding.
 - 3 seeds with fixed data: no confidence intervals over data resampling.
-- Only CPU-server latency was measured; no mobile/NPU measurement, no Core ML export. Dockerfile and compose file are untested beyond `docker compose config`.
+- Only CPU-server latency was measured; no mobile/NPU measurement, no Core ML export. The Docker image was verified once on one machine (FP32 backend only; ONNX/INT8 backends and `/metrics` were not exercised in Docker).
 - Full-scale GPU run (`notebooks/colab_full_training.ipynb`, `configs/colab_full.yaml`) and real-audio manifest run: **not yet run**.
 
 ## Roadmap

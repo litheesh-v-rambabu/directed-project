@@ -48,13 +48,19 @@ Starting from empty `runs/` and `data/`: `pip install -e ".[all]"`, then `dsd tr
 
 **Reproducibility finding.** That quickstart run uses the same config and seed as ablation run `fused_speaker_s0` but 4 threads instead of 1 thread: its test EER was 7.8% vs 7.3% for the ablation run (accuracy 91.65% vs 91.80% at the 5%-FAR threshold, realised FAR 7.0% vs 5.7%). So runs are reproducible given identical settings (the test suite asserts identical loss curves for repeated runs), but not bit-for-bit across thread counts; differences are of the order of the seed-to-seed standard deviation in E1.
 
+## E7. Docker verification (run by the repo owner on their Mac)
+Environment reported by `docker info`: Docker Desktop 4.98.0, engine 29.9.2, `aarch64` (Apple silicon), 10 CPUs and 7.7 GiB available to Docker. Commands: `dsd train --config configs/fused_speaker.yaml` (local run, so its threshold/temperature differ from the tables above), then `RUN_DIR=./runs/fused_speaker docker compose up --build`.
+- Image build succeeded (`python:3.11-slim`, CPU PyTorch, 90 s); Uvicorn started and loaded the model.
+- `GET /health` returned `status: ok`, 552,771 parameters, threshold 0.627, temperature 1.60.
+- One `POST /predict` with 1 s of synthetic noise and a transcript returned `probability_directed` 0.094, `is_directed` false, latency feature 17.8 ms / model 21.8 ms / total 40.9 ms. This is a single first request in a container on a laptop, not a benchmark, and it says nothing about accuracy.
+- Not exercised in Docker: ONNX/INT8 backends, `/metrics`, the healthcheck result.
+
 ## Not yet run
 | Item | Why |
 |---|---|
 | Full-scale GPU run (`configs/colab_full.yaml`, `notebooks/colab_full_training.ipynb`) | No GPU in the build environment |
 | Real-audio manifest run (`configs/real_audio_template.yaml`) and any public dataset (SLURP, LibriSpeech, AMI, Common Voice) | Dataset hosts unreachable from the sandbox |
 | Pretrained-encoder fine-tuning | Not implemented (`DECISIONS.md` D14) |
-| `docker build` / `docker compose up` | Docker CLI present but no daemon in the sandbox; `docker compose config` validates the compose file only |
 | Core ML export | Not attempted (`DECISIONS.md` D12) |
 | GitHub Actions CI on Python 3.11/3.12 | Workflow committed; results are reported in the README only after a run is observed |
 | Multi-seed benchmark / on-device (phone, NPU) latency | Single CPU benchmark only |
