@@ -1,0 +1,5 @@
+base: base.yaml
+name: audio_only
+model:
+  modalities: [audio]
+  modality_dropout: 0.0

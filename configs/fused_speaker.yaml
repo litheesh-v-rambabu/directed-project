@@ -1,0 +1,5 @@
+base: base.yaml
+name: fused_speaker
+model:
+  modalities: [audio, text, speaker]
+  modality_dropout: 0.1

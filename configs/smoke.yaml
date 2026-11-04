@@ -1,0 +1,18 @@
+# Tiny configuration used by tests and CI: finishes in seconds on CPU.
+base: base.yaml
+name: smoke
+output_dir: runs
+data:
+  n_train: 300
+  n_val: 100
+  n_test: 100
+  num_workers: 1
+  cache_dir: data/cache_smoke
+model:
+  modalities: [audio, text, speaker]
+  d_model: 32
+  audio_layers: 1
+  text_layers: 1
+train:
+  epochs: 3
+  batch_size: 32

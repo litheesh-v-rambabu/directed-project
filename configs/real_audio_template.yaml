@@ -1,0 +1,11 @@
+# Template for a real-audio manifest run (audio + text only). NOT YET RUN.
+# Put train.csv / val.csv / test.csv (audio_path,transcript,label) in data/real/.
+base: base.yaml
+name: real_audio_template
+data:
+  manifest_dir: data/real
+model:
+  modalities: [audio, text]
+train:
+  epochs: 20
+  device: auto
