@@ -1,0 +1,12 @@
+services:
+  detector:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DSD_RUN_DIR: /models/run
+      DSD_BACKEND: ${DSD_BACKEND:-fp32}   # fp32 | int8 | onnx
+    volumes:
+      # Mount a trained run directory, e.g. RUN_DIR=./runs/fused_speaker_s0
+      - ${RUN_DIR:-./runs/fused_speaker_s0}:/models/run:ro
+    restart: unless-stopped
