@@ -1,6 +1,6 @@
 # Directed Speech Detector
 
-[![CI](https://github.com/litheesh-v-rambabu/directed-project/actions/workflows/ci.yml/badge.svg)](https://github.com/litheesh-v-rambabu/directed-project/actions/workflows/ci.yml) ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg) ![Data: synthetic proxy](https://img.shields.io/badge/data-synthetic%20proxy-orange.svg)
+[![CI](https://github.com/litheesh-v-rambabu/directed-speech-detector/actions/workflows/ci.yml/badge.svg)](https://github.com/litheesh-v-rambabu/directed-speech-detector/actions/workflows/ci.yml) ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg) ![Data: synthetic proxy](https://img.shields.io/badge/data-synthetic%20proxy-orange.svg)
 
 A multimodal system that decides whether an utterance is **directed at a voice assistant** or is **background speech**, using the audio, the ASR transcript and an optional **enrolled-speaker** signal, with an eye on **on-device** deployment (INT8 quantization, ONNX export, latency/size benchmarks, a small FastAPI service).
 
