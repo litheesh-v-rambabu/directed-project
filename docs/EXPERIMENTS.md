@@ -43,6 +43,11 @@ dsd benchmark --run-dir runs/fused_speaker_s0     # default --iterations 300; wr
 ## E5. Tests / quality gates
 `pytest` (67 tests, including slow end-to-end tests), `ruff check`, `ruff format --check`, `mypy` (strict) all pass locally on Python 3.13; final counts are in the README "Quality" section.
 
+## E6. Clean-state quickstart and reproducibility check
+Starting from empty `runs/` and `data/`: `pip install -e ".[all]"`, then `dsd train --config configs/fused_speaker.yaml` (6 m 41 s wall-clock on 4 threads, including data generation) and `dsd serve --run-dir runs/fused_speaker --backend fp32` (`GET /health` returned `status: ok`, 552,771 parameters). `pytest` passes (67 tests, 97% line coverage of `src/`), `ruff check`, `ruff format --check` and `mypy` are clean.
+
+**Reproducibility finding.** That quickstart run uses the same config and seed as ablation run `fused_speaker_s0` but 4 threads instead of 1 thread: its test EER was 7.8% vs 7.3% for the ablation run (accuracy 91.65% vs 91.80% at the 5%-FAR threshold, realised FAR 7.0% vs 5.7%). So runs are reproducible given identical settings (the test suite asserts identical loss curves for repeated runs), but not bit-for-bit across thread counts; differences are of the order of the seed-to-seed standard deviation in E1.
+
 ## Not yet run
 | Item | Why |
 |---|---|

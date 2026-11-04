@@ -103,10 +103,10 @@ One intra-op thread, Intel Xeon @ 2.1 GHz (sandbox VM), 300 timed batch-1 calls,
 ![Latency and size](docs/figures/latency_size.png)
 
 ## Reproducibility
-Config-driven (`configs/*.yaml`, `--set section.key=value` overrides), seeded generator and training, deterministic splits independent of worker count, a test asserting identical loss curves for repeated training. Exact commands/configs/hardware for every reported number: `docs/EXPERIMENTS.md`. Design choices: `docs/DECISIONS.md`. Data caveats: `docs/DATA.md`. Model card: `docs/MODEL_CARD.md`.
+Config-driven (`configs/*.yaml`, `--set section.key=value` overrides), seeded generator and training, deterministic splits independent of worker count, a test asserting identical loss curves for repeated training under identical settings. Bit-exactness does **not** hold across thread counts: re-running seed 0 with 4 threads instead of 1 gave a test EER of 7.8 % vs 7.3 % (see `docs/EXPERIMENTS.md` E6), comparable to the seed-to-seed spread. Exact commands/configs/hardware for every reported number: `docs/EXPERIMENTS.md`. Design choices: `docs/DECISIONS.md`. Data caveats: `docs/DATA.md`. Model card: `docs/MODEL_CARD.md`.
 
 ## Quality
-`pytest` (67 tests incl. ONNX parity, padding-invariance, API validation, end-to-end train→evaluate→export→serve), `ruff` lint + format, `mypy --strict`, pre-commit hooks, GitHub Actions workflow (lint, type-check, tests on Python 3.11/3.12), Makefile targets (`setup test lint train eval export serve`). Verified locally on Python 3.13.
+`pytest` (67 tests, 97 % line coverage of `src/`, incl. ONNX parity, padding-invariance, API validation, end-to-end train→evaluate→export→serve), `ruff` lint + format, `mypy --strict`, pre-commit hooks, GitHub Actions workflow (lint, type-check, tests on Python 3.11/3.12), Makefile targets (`setup test lint train eval export serve`). Verified locally on Python 3.13.
 
 ## Limitations
 - **Synthetic proxy data only.** Acoustic and text differences between classes are my assumptions; the speaker voices are random draws. Results say nothing about real devices.
